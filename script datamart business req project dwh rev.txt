@@ -1,0 +1,85 @@
+# Soal No 1
+
+SELECT EXTRACT(YEAR FROM order_date) AS "SalesYear",
+       EXTRACT(MONTH FROM order_date) AS "SalesMonth",
+       SUM(order_total) AS "TotalSales"
+FROM fact_orders
+GROUP BY EXTRACT(YEAR FROM order_date), EXTRACT(MONTH FROM order_date)
+ORDER BY EXTRACT(YEAR FROM order_date), EXTRACT(MONTH FROM order_date);
+
+# soal no 2 rev
+SELECT
+    dp.product_category_id,
+    COUNT(dp.product_category_id) AS SUM_product_category_id,
+    dpc.product_category_name,
+    SUM(fo.order_total) AS total_order_value
+FROM
+    fact_order_item foi
+INNER JOIN
+    dim_product dp ON dp.product_id = foi.product_id
+INNER JOIN
+    dim_product_category dpc ON dpc.product_category_id = dp.product_category_id
+INNER JOIN
+    fact_order fo ON foi.order_id = fo.order_id  
+GROUP BY
+    dp.product_category_id, dpc.product_category_name
+ORDER BY
+    dpc.product_category_name ASC;
+
+# Soal No. 3
+select 
+fo.payment_id, 
+COUNT(fo.payment_id) SUM_payment_id, 
+dp.payment_name
+from fact_orders fo 
+inner join dim_payment dp ON dp.payment_id = fo.payment_id 
+group  by fo.payment_id, dp.payment_name
+order by dp.payment_name asc 
+
+# Soal No. 4
+select 
+fo.shipper_id,
+COUNT(fo.shipper_id) SUM_shipper_id,
+ds.shipper_name
+from fact_orders fo 
+inner join dim_shipper ds ON ds.shipper_id = fo.shipper_id 
+group  by fo.shipper_id , ds.shipper_name 
+order by ds.shipper_name asc
+
+# soal no 5 and 9 rev
+select 
+fo.user_id,
+count(fo.user_id) as freq_order_per_user_id,
+CONCAT(du.user_first_name, ' ', user_last_name) full_name,
+sum(fo.order_total) as total_order_value,
+sum(fo.order_total)/count(fo.order_id) as average_order_value,
+du.user_gender
+from fact_orders fo 
+inner join dim_user du ON fo.user_id = du.user_id 
+group  by fo.user_id, du.user_first_name, du.user_last_name, user_gender 
+order by du.user_gender asc, CONCAT(du.user_first_name, ' ', user_last_name) asc
+
+# soal No 7
+select 
+LTRIM(split_part(u.user_address, ',', array_length(string_to_array(u.user_address, ','), 1))) AS province,
+sum(fo.order_total) as total_order_value,
+count(fo.order_id) as count_order_number
+from
+dim_user u
+join
+fact_orders fo on u.user_id = fo.user_id 
+group by 
+province
+order by total_order_value desc;
+
+
+# Soal No. 10
+select v.voucher_name,
+count(fo.order_id) as "Total_Orders"
+from dim_voucher v
+left join
+fact_orders fo on v.voucher_id = fo.voucher_id 
+group by 
+v.voucher_name;
+
+soal no 6 diambil dari tabel fact_order, tidak dibuat datamart baru
